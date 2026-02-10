@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Qalb",
+  "description": "A minimalist Islamic companion app with prayer times, Quran, and Duas, designed with a clean black and white aesthetic.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
