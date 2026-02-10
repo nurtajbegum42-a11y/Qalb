@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Surah, Ayah } from '../types';
 import { fetchFullSurah } from '../services/quranService';
 import { ICONS } from '../constants';
@@ -14,6 +14,9 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
   const [tab, setTab] = useState<'bn' | 'en'>('bn');
   const [loading, setLoading] = useState(true);
   const [expandedSection, setExpandedSection] = useState<{ [key: number]: 'tafsir' | 'lesson' | null }>({});
+  const [playingAyahNumber, setPlayingAyahNumber] = useState<number | null>(null);
+  
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -22,6 +25,13 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
       setLoading(false);
     });
     window.scrollTo(0, 0);
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
   }, [surah.number]);
 
   const toggleSection = (ayahNum: number, section: 'tafsir' | 'lesson') => {
@@ -29,6 +39,37 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
       ...prev,
       [ayahNum]: prev[ayahNum] === section ? null : section
     }));
+  };
+
+  const playAyahAudio = (ayah: Ayah) => {
+    if (!ayah.audio) return;
+
+    if (playingAyahNumber === ayah.number) {
+      if (audioRef.current?.paused) {
+        audioRef.current.play();
+      } else {
+        audioRef.current?.pause();
+        setPlayingAyahNumber(null);
+      }
+      return;
+    }
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+
+    const audio = new Audio(ayah.audio);
+    audioRef.current = audio;
+    setPlayingAyahNumber(ayah.number);
+
+    audio.play();
+    audio.onended = () => {
+      setPlayingAyahNumber(null);
+    };
+    audio.onerror = () => {
+      setPlayingAyahNumber(null);
+      alert("Failed to play audio. Check your connection.");
+    };
   };
 
   return (
@@ -82,10 +123,16 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
             {ayahs.map((ayah) => (
               <div key={ayah.number} className="group space-y-6 border-b border-black/[0.03] pb-10">
                 <div className="flex justify-between items-start gap-6">
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center gap-4">
                     <span className="text-[10px] font-black w-10 h-10 bg-white shadow-sm border border-black/[0.03] flex items-center justify-center rounded-[10px]">
                       {ayah.numberInSurah}
                     </span>
+                    <button 
+                      onClick={() => playAyahAudio(ayah)}
+                      className={`p-3 rounded-[10px] border shadow-sm transition-all active:scale-90 ${playingAyahNumber === ayah.number ? 'bg-black text-white border-black' : 'bg-white text-black border-black/5'}`}
+                    >
+                      {playingAyahNumber === ayah.number ? <ICONS.Pause /> : <ICONS.Play />}
+                    </button>
                   </div>
                   <p className="text-right font-arabic text-3xl leading-[2.8] flex-1 text-black" dir="rtl">
                     {ayah.text}

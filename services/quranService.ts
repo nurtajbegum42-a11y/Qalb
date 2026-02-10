@@ -27,22 +27,24 @@ export const fetchFullSurah = async (number: number): Promise<Ayah[]> => {
   const cached = cacheService.get<Ayah[]>(cacheKey);
   if (cached) return cached;
 
-  const editions = 'quran-simple,bn.bengali,en.sahih,en.tafsir-ibn-kathir';
+  const editions = 'quran-simple,bn.bengali,en.sahih,en.tafsir-ibn-kathir,ar.alafasy';
   try {
     const response = await fetch(`https://api.alquran.cloud/v1/surah/${number}/editions/${editions}`);
     const data = await response.json();
     
-    if (!data.data || data.data.length < 4) throw new Error("Incomplete data from API");
+    if (!data.data || data.data.length < 5) throw new Error("Incomplete data from API");
 
     const arabic = data.data[0].ayahs;
     const bn = data.data[1].ayahs;
     const en = data.data[2].ayahs;
     const en_tafsir = data.data[3].ayahs;
+    const audio = data.data[4].ayahs;
 
     const formattedAyahs = arabic.map((ayah: any, index: number) => {
       let rawEnTafsir = en_tafsir[index].text;
       const bnTranslationText = bn[index].text;
       const enTranslationText = en[index].text;
+      const audioUrl = audio[index].audio;
       let cleanedEnTafsir = cleanEnglishText(rawEnTafsir);
       
       if (cleanedEnTafsir.length < 20) {
@@ -56,7 +58,8 @@ export const fetchFullSurah = async (number: number): Promise<Ayah[]> => {
         tafsir_en: cleanedEnTafsir,
         tafsir_bn: `তাফসীর ও ব্যাখ্যা: এই আয়াতে মহান আল্লাহ তাঁর বান্দাদের জন্য গুরুত্বপূর্ণ হেদায়েত প্রদান করেছেন।`,
         lesson_en: `This verse teaches us sincerity and patience in faith.`,
-        lesson_bn: `এই আয়াত থেকে আমাদের শিক্ষা হলো মহান আল্লাহর হুকুম পালনে সচেষ্ট হওয়া।`
+        lesson_bn: `এই আয়াত থেকে আমাদের শিক্ষা হলো মহান আল্লাহর হুকুম পালনে সচেষ্ট হওয়া।`,
+        audio: audioUrl
       };
     });
 
@@ -69,17 +72,18 @@ export const fetchFullSurah = async (number: number): Promise<Ayah[]> => {
 };
 
 export const fetchAyahDetail = async (surahNum: number, ayahNum: number): Promise<Ayah | null> => {
-  const editions = 'quran-simple,bn.bengali,en.sahih,en.tafsir-ibn-kathir';
+  const editions = 'quran-simple,bn.bengali,en.sahih,en.tafsir-ibn-kathir,ar.alafasy';
   try {
     const response = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/${editions}`);
     const data = await response.json();
     
-    if (!data.data || data.data.length < 4) return null;
+    if (!data.data || data.data.length < 5) return null;
 
     const arabic = data.data[0];
     const bn = data.data[1].text;
     const en = data.data[2].text;
     const en_tafsir = cleanEnglishText(data.data[3].text);
+    const audioUrl = data.data[4].audio;
 
     return {
       ...arabic,
@@ -88,7 +92,8 @@ export const fetchAyahDetail = async (surahNum: number, ayahNum: number): Promis
       tafsir_en: en_tafsir || "Scholars reflect on this verse as a core pillar of Islamic guidance, emphasizing faith and character.",
       tafsir_bn: `তাফসীর ও ব্যাখ্যা: মুফাসসিরগণের মতে, এই আয়াতের গভীর তাৎপর্য রয়েছে যা আমাদের ঈমানি জীবনকে সমৃদ্ধ করে।`,
       lesson_en: "Always seek truth and maintain steadfastness in your worship.",
-      lesson_bn: "সব সময় সত্যের পথে চলা এবং ইবাদতে একনিষ্ঠ থাকা এই আয়াতের মূল শিক্ষা।"
+      lesson_bn: "সব সময় সত্যের পথে চলা এবং ইবাদতে একনিষ্ঠ থাকা এই আয়াতের মূল শিক্ষা।",
+      audio: audioUrl
     };
   } catch (e) {
     return null;

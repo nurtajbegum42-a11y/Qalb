@@ -46,6 +46,7 @@ export interface Ayah {
   tafsir_en?: string;
   lesson_bn?: string;
   lesson_en?: string;
+  audio?: string;
 }
 
 export type View = 'home' | 'prayer' | 'dua' | 'quran' | 'surah-detail';
