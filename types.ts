@@ -12,16 +12,7 @@ export interface PrayerTimings {
   Lastthird: string;
 }
 
-export interface Dua {
-  id: number;
-  title: string;
-  arabic: string;
-  bangla: string;
-  english: string;
-  category?: string;
-  reference?: string;
-}
-
+// Fixed: Added Surah interface for Quran functionality
 export interface Surah {
   number: number;
   name: string;
@@ -31,6 +22,7 @@ export interface Surah {
   revelationType: string;
 }
 
+// Fixed: Added Ayah interface with optional translation and tafsir fields
 export interface Ayah {
   number: number;
   text: string;
@@ -40,13 +32,27 @@ export interface Ayah {
   page: number;
   ruku: number;
   hizbQuarter: number;
+  sajda: boolean | any;
+  audio?: string;
   translation_bn?: string;
   translation_en?: string;
   tafsir_bn?: string;
   tafsir_en?: string;
   lesson_bn?: string;
   lesson_en?: string;
-  audio?: string;
+}
+
+export interface Dua {
+  id: number;
+  title: string;
+  arabic: string;
+  bangla: string;
+  english: string;
+  category?: string;
+  reference?: string;
+  benefit_bn?: string;
+  benefit_en?: string;
+  isRuqyah?: boolean;
 }
 
 export type View = 'home' | 'prayer' | 'dua' | 'quran' | 'surah-detail';

@@ -141,8 +141,8 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. Tafsir of the Day (New Section) */}
-      <section className="space-y-4 pb-20">
+      {/* 5. Tafsir of the Day */}
+      <section className="space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 px-2">Tafsir of the Day</h3>
         <div className="bg-white rounded-[10px] p-6 shadow-lg shadow-black/[0.04] border border-black/[0.05] space-y-6">
           {dailyTafsir ? (
@@ -189,6 +189,21 @@ const Home: React.FC = () => {
           )}
         </div>
       </section>
+
+      {/* 6. Footer / Credit Section */}
+      <footer className="pt-10 pb-32 border-t border-black/[0.03] flex flex-col items-center justify-center space-y-2 text-center">
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-20 px-6">
+          © 2024-25 QALB. ALL RIGHTS RESERVED.
+        </p>
+        <div className="space-y-1">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">
+            CREDIT: <span className="text-black">CODENEST25</span>
+          </p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">
+            DEVELOPER: <span className="text-black">@SIAMAFRID</span>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };

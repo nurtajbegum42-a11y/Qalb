@@ -2,10 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { ALL_DUAS } from '../services/duaService';
 import { ICONS } from '../constants';
+import { Dua } from '../types';
 
 const DuaView: React.FC = () => {
   const [search, setSearch] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'bookmarks'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'ruqyah' | 'bookmarks'>('all');
   const [bookmarks, setBookmarks] = useState<number[]>([]);
 
   // Initialize bookmarks from localStorage
@@ -31,12 +32,24 @@ const DuaView: React.FC = () => {
     );
   };
 
-  const filteredDuas = (activeTab === 'all' ? ALL_DUAS : ALL_DUAS.filter(d => bookmarks.includes(d.id))).filter(d => 
-    d.title.toLowerCase().includes(search.toLowerCase()) || 
-    d.category?.toLowerCase().includes(search.toLowerCase()) ||
-    d.english.toLowerCase().includes(search.toLowerCase()) ||
-    d.reference?.toLowerCase().includes(search.toLowerCase())
-  );
+  const getFilteredDuas = () => {
+    let baseList = ALL_DUAS;
+    
+    if (activeTab === 'ruqyah') {
+      baseList = ALL_DUAS.filter(d => d.isRuqyah === true);
+    } else if (activeTab === 'bookmarks') {
+      baseList = ALL_DUAS.filter(d => bookmarks.includes(d.id));
+    }
+
+    return baseList.filter(d => 
+      d.title.toLowerCase().includes(search.toLowerCase()) || 
+      d.category?.toLowerCase().includes(search.toLowerCase()) ||
+      d.english.toLowerCase().includes(search.toLowerCase()) ||
+      d.reference?.toLowerCase().includes(search.toLowerCase())
+    );
+  };
+
+  const filteredDuas = getFilteredDuas();
 
   return (
     <div className="flex flex-col h-full animate-in slide-in-from-bottom-2 duration-500">
@@ -48,25 +61,31 @@ const DuaView: React.FC = () => {
           </div>
           <input 
             type="text" 
-            placeholder="Search Duas (e.g. Morning, Al-Baqarah...)"
+            placeholder="Search Duas & Ruqyah..."
             className="w-full pl-12 pr-6 py-4 bg-white rounded-[10px] shadow-sm shadow-black/[0.02] border border-black/[0.05] focus:ring-1 focus:ring-black transition-all placeholder:text-[10px] placeholder:uppercase placeholder:tracking-widest"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        <div className="bg-white p-1 rounded-[10px] border border-black/[0.05] flex shadow-sm">
+        <div className="bg-white p-1 rounded-[10px] border border-black/[0.05] flex shadow-sm gap-1">
           <button 
             onClick={() => setActiveTab('all')}
-            className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-[8px] transition-all duration-300 ${activeTab === 'all' ? 'bg-black text-white shadow-md' : 'opacity-40'}`}
+            className={`flex-1 py-3 text-[9px] font-black uppercase tracking-[0.1em] rounded-[8px] transition-all duration-300 ${activeTab === 'all' ? 'bg-black text-white shadow-md' : 'opacity-40'}`}
           >
-            All Duas
+            All
+          </button>
+          <button 
+            onClick={() => setActiveTab('ruqyah')}
+            className={`flex-1 py-3 text-[9px] font-black uppercase tracking-[0.1em] rounded-[8px] transition-all duration-300 ${activeTab === 'ruqyah' ? 'bg-black text-white shadow-md' : 'opacity-40'}`}
+          >
+            Rukaiya
           </button>
           <button 
             onClick={() => setActiveTab('bookmarks')}
-            className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-[8px] transition-all duration-300 ${activeTab === 'bookmarks' ? 'bg-black text-white shadow-md' : 'opacity-40'}`}
+            className={`flex-1 py-3 text-[9px] font-black uppercase tracking-[0.1em] rounded-[8px] transition-all duration-300 ${activeTab === 'bookmarks' ? 'bg-black text-white shadow-md' : 'opacity-40'}`}
           >
-            Bookmarks ({bookmarks.length})
+            Saved ({bookmarks.length})
           </button>
         </div>
       </div>
@@ -102,6 +121,14 @@ const DuaView: React.FC = () => {
                     <span className="text-[8px] font-black uppercase tracking-widest block opacity-30 mb-1">English Translation</span>
                     <p className="text-sm italic opacity-70 leading-relaxed text-black/80">{dua.english}</p>
                   </div>
+                  
+                  {(dua.benefit_bn || dua.benefit_en) && (
+                    <div className="p-4 bg-black/[0.02] rounded-[8px] border border-black/[0.03] space-y-2">
+                       <span className="text-[8px] font-black uppercase tracking-widest opacity-50 block mb-1">Benefit / Reason (কেন পড়বেন)</span>
+                       {dua.benefit_bn && <p className="text-[11px] leading-relaxed font-bold">{dua.benefit_bn}</p>}
+                       {dua.benefit_en && <p className="text-[11px] leading-relaxed italic opacity-70">{dua.benefit_en}</p>}
+                    </div>
+                  )}
                 </div>
 
                 {dua.reference && (
