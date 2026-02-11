@@ -8,6 +8,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Qalb">
+    
+    <!-- App Icons -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSJ3aGl0ZSIvPjxwYXRoIGQ9Ik0xMiAyLjVDMTAuNSA2LjUgNy41IDggNy41IDEyQzcuNSAxNC41IDguNSAxNiA4LjUgMTZWMjEuNUgxMS41VjE3LjVDMTEuNSAxNyAxMS43IDE2LjUgMTIgMTYuNUMxMi4zIDE2LjUgMTIuNSAxNyAxMi41IDE3LjVWMjEuNUgxNS41VjE2QzE1LjUgMTYgMTYuNSAxNC41IDE2LjUgMTJDMTYuNSA4IDEzLjUgNi41IDEyIDIuNVoiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMS4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSJ3aGl0ZSIvPjxwYXRoIGQ9Ik0xMiAyLjVDMTAuNSA2LjUgNy41IDggNy41IDEyQzcuNSAxNC41IDguNSAxNiA4LjUgMTZWMjEuNUgxMS41VjE3LjVDMTEuNSAxNyAxMS43IDE2LjUgMTIgMTYuNUMxMi4zIDE2LjUgMTIuNSAxNyAxMi41IDE3LjVWMjEuNUgxNS41VjE2QzE1LjUgMTYgMTYuNSAxNC41IDE2LjUgMTJDMTYuNSA4IDEzLjUgNi41IDEyIDIuNVoiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMS4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=">
+    
+    <!-- PWA Link -->
+    <link rel="manifest" href="manifest.json">
+    
     <title>Qalb - Islamic Companion</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
@@ -46,9 +54,17 @@
   }
 }
 </script>
-        <script type="module" src="/index.tsx"></script>
 </head>
 <body>
     <div id="root"></div>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(err => {
+                    console.log('SW registration failed: ', err);
+                });
+            });
+        }
+    </script>
 </body>
 </html>

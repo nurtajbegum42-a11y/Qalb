@@ -9,21 +9,40 @@ import { DAILY_DUAS } from '../constants';
 const Home: React.FC = () => {
   const [timings, setTimings] = useState<PrayerTimings | null>(null);
   const [nextPrayer, setNextPrayer] = useState<{ name: string; time: Date } | null>(null);
+  const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<string>('00:00:00');
+  const [now, setNow] = useState<Date>(new Date());
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [locationName, setLocationName] = useState<string>('Locating...');
   const [dailyTafsir, setDailyTafsir] = useState<Ayah | null>(null);
   const [tafsirTab, setTafsirTab] = useState<'bn' | 'en'>('bn');
 
   useEffect(() => {
     const loadData = () => {
-      // Load Prayer Timings
+      // Load Prayer Timings & Location Name
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          fetchPrayerTimings(pos.coords.latitude, pos.coords.longitude)
+          const { latitude: lat, longitude: lng } = pos.coords;
+          
+          // Fetch Prayer Timings
+          fetchPrayerTimings(lat, lng)
             .then(setTimings)
             .catch(() => setLocationError("API Error. Please try again."));
+
+          // Reverse Geocode for City Name
+          fetch(`https://api.bigdatacoloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`)
+            .then(res => res.json())
+            .then(data => {
+              const city = data.city || data.locality || "Unknown";
+              const country = data.countryCode || "";
+              setLocationName(`${city}${country ? `, ${country}` : ''}`);
+            })
+            .catch(() => setLocationName("Location Set"));
         },
-        () => setLocationError("Enable Location for accurate timings.")
+        () => {
+          setLocationError("Enable Location for accurate timings.");
+          setLocationName("Global");
+        }
       );
 
       // Load Daily Tafsir
@@ -34,13 +53,11 @@ const Home: React.FC = () => {
       if (cachedTafsir) {
         setDailyTafsir(cachedTafsir);
       } else {
-        // Selection logic: pick a surah/ayah based on day of year
         const start = new Date(new Date().getFullYear(), 0, 0);
         const diff = new Date().getTime() - start.getTime();
         const oneDay = 1000 * 60 * 60 * 24;
         const dayOfYear = Math.floor(diff / oneDay);
         
-        // Pick from some meaningful Ayahs (Surah:Ayah)
         const meaningfulAyahs = [
           [1, 1], [2, 255], [2, 286], [3, 191], [4, 135], [5, 3], [6, 162], [7, 54],
           [8, 2], [9, 128], [10, 62], [11, 114], [12, 101], [13, 28], [14, 7], [15, 9]
@@ -59,13 +76,16 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (timings) {
-      const interval = setInterval(() => {
+    const interval = setInterval(() => {
+      const currentTime = new Date();
+      setNow(currentTime);
+
+      if (timings) {
+        // 1. Calculate Next Prayer
         const next = getNextPrayer(timings);
         setNextPrayer(next);
         
-        const now = new Date().getTime();
-        const diff = next.time.getTime() - now;
+        const diff = next.time.getTime() - currentTime.getTime();
         
         if (diff > 0) {
           const hours = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
@@ -73,10 +93,33 @@ const Home: React.FC = () => {
           const secs = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
           setCountdown(`${hours}:${mins}:${secs}`);
         }
-      }, 1000);
-      return () => clearInterval(interval);
-    }
+
+        // 2. Calculate Current Active Prayer
+        const prayerKeys = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] as const;
+        let current = 'Isha'; // Default to Isha for late night/pre-fajr
+        for (const key of prayerKeys) {
+          const [h, m] = timings[key].split(':').map(Number);
+          const pTime = new Date(currentTime);
+          pTime.setHours(h, m, 0, 0);
+          
+          if (currentTime >= pTime) {
+            current = key;
+          } else {
+            break; 
+          }
+        }
+        setCurrentPrayer(current);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
   }, [timings]);
+
+  const formattedTime = now.toLocaleTimeString([], { 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    second: '2-digit', 
+    hour12: true 
+  });
 
   const bannerDua = DAILY_DUAS[new Date().getDate() % DAILY_DUAS.length];
 
@@ -95,18 +138,36 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. Next Prayer with Live Countdown */}
+      {/* 2. Next Prayer with Live Countdown & Location */}
       <section className="space-y-4">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 px-2">Coming Up Next</h3>
+        <div className="flex justify-between items-end px-2">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Coming Up Next</h3>
+          <span className="text-[8px] font-black uppercase tracking-widest opacity-30">{locationName}</span>
+        </div>
         {locationError ? (
           <div className="bg-white rounded-[10px] p-6 text-center text-xs uppercase tracking-widest shadow-sm border border-black/[0.03]">{locationError}</div>
         ) : (
-          <div className="bg-white rounded-[10px] p-8 flex flex-col items-center justify-center space-y-2 shadow-lg shadow-black/[0.03] border border-black/[0.03]">
-            <span className="text-5xl font-black uppercase tracking-tighter">{nextPrayer?.name || '---'}</span>
-            <div className="flex items-center gap-3">
-              <div className="h-[2px] w-6 bg-black rounded-full opacity-10"></div>
-              <span className="text-xl font-mono tracking-[0.3em] tabular-nums">{countdown}</span>
-              <div className="h-[2px] w-6 bg-black rounded-full opacity-10"></div>
+          <div className="bg-white rounded-[10px] p-8 flex flex-col items-center justify-center space-y-4 shadow-lg shadow-black/[0.03] border border-black/[0.03]">
+            {/* Current Clock and Active Salah */}
+            <div className="flex flex-col items-center">
+              <span className="text-[8px] font-black uppercase tracking-[0.4em] opacity-20 mb-1">Current Time</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl font-mono font-black tracking-widest tabular-nums">{formattedTime}</span>
+                {currentPrayer && (
+                  <span className="text-[10px] font-black uppercase opacity-40 tracking-widest">({currentPrayer})</span>
+                )}
+              </div>
+            </div>
+
+            <div className="h-[1px] w-12 bg-black/5"></div>
+
+            {/* Prayer Name & Countdown */}
+            <div className="flex flex-col items-center space-y-3">
+              <span className="text-5xl font-black uppercase tracking-tighter leading-none">{nextPrayer?.name || '---'}</span>
+              <div className="flex flex-col items-center">
+                <span className="text-[8px] font-black uppercase tracking-widest opacity-30 whitespace-nowrap mb-1">(will start after)</span>
+                <span className="text-xl font-mono tracking-[0.3em] tabular-nums font-black">{countdown}</span>
+              </div>
             </div>
           </div>
         )}
@@ -191,7 +252,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* 6. Footer / Credit Section */}
-      <footer className="pt-10 pb-32 border-t border-black/[0.03] flex flex-col items-center justify-center space-y-2 text-center">
+      <footer className="pt-10 pb-32 border-t border-black/[0.03] flex flex-col items-center justify-center space-y-4 text-center">
         <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-20 px-6">
           © 2024-25 QALB. ALL RIGHTS RESERVED.
         </p>
@@ -203,6 +264,14 @@ const Home: React.FC = () => {
             DEVELOPER: <span className="text-black">@SIAMAFRID</span>
           </p>
         </div>
+        <a 
+          href="/privacy.html" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-[9px] font-black uppercase tracking-[0.2em] text-black/30 underline decoration-black/10 underline-offset-4"
+        >
+          Privacy Policy
+        </a>
       </footer>
     </div>
   );

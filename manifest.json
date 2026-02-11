@@ -1,0 +1,25 @@
+
+{
+  "short_name": "Qalb",
+  "name": "Qalb - Islamic Companion",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSJ3aGl0ZSIvPjxwYXRoIGQ9Ik0xMiAyLjVDMTAuNSA2LjUgNy41IDggNy41IDEyQzcuNSAxNC41IDguNSAxNiA4LjUgMTZWMjEuNUgxMS41VjE3LjVDMTEuNSAxNyAxMS43IDE2LjUgMTIgMTYuNUMxMi4zIDE2LjUgMTIuNSAxNyAxMi41IDE3LjVWMjEuNUgxNS41VjE2QzE1LjUgMTYgMTYuNSAxNC41IDE2LjUgMTJDMTYuNSA4IDEzLjUgNi41IDEyIDIuNVoiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMS4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSJ3aGl0ZSIvPjxwYXRoIGQ9Ik0xMiAyLjVDMTAuNSA2LjUgNy41IDggNy41IDEyQzcuNSAxNC41IDguNSAxNiA4LjUgMTZWMjEuNUgxMS41VjE3LjVDMTEuNSAxNyAxMS43IDE2LjUgMTIgMTYuNUMxMi4zIDE2LjUgMTIuNSAxNyAxMi41IDE3LjVWMjEuNUgxNS41VjE2QzE1LjUgMTYgMTYuNSAxNC41IDE2LjUgMTJDMTYuNSA4IDEzLjUgNi41IDEyIDIuNVoiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMS4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "scope": "/",
+  "description": "A minimalist Islamic companion app with prayer times, Quran, and Duas."
+}

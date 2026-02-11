@@ -28,13 +28,24 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('home');
   const [selectedSurah, setSelectedSurah] = useState<Surah | null>(null);
   const [isSplashVisible, setIsSplashVisible] = useState(true);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
-    // Initial loading timer
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
     const timer = setTimeout(() => {
       setIsSplashVisible(false);
     }, 2500);
-    return () => clearTimeout(timer);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      clearTimeout(timer);
+    };
   }, []);
 
   const navigateToSurah = (surah: Surah) => {
@@ -47,7 +58,7 @@ const App: React.FC = () => {
       case 'home': return <Home />;
       case 'prayer': return <PrayerTimes />;
       case 'dua': return <DuaView />;
-      case 'quran': return <Quran onSelectSurah={navigateToSurah} />;
+      case 'quran': return <Quran onSelectSurah= {navigateToSurah} />;
       case 'surah-detail': 
         return selectedSurah ? (
           <SurahDetail 
@@ -66,6 +77,11 @@ const App: React.FC = () => {
 
   return (
     <>
+      {!isOnline && (
+        <div className="fixed top-0 left-0 right-0 bg-black text-white text-[8px] font-black uppercase tracking-[0.3em] py-1 text-center z-[100] animate-in slide-in-from-top duration-300">
+          Viewing Offline Content
+        </div>
+      )}
       {isSplashVisible && <SplashScreen />}
       <Layout 
         currentView={currentView} 
