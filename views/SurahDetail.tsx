@@ -24,14 +24,7 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
       setAyahs(data);
       setLoading(false);
     });
-    window.scrollTo(0, 0);
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
+    // Scroll handling is now managed by the parent container in Layout.tsx
   }, [surah.number]);
 
   const toggleSection = (ayahNum: number, section: 'tafsir' | 'lesson') => {
@@ -74,8 +67,8 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
 
   return (
     <div className="min-h-full bg-white flex flex-col animate-in slide-in-from-right duration-400">
-      {/* Sticky Header */}
-      <div className="sticky top-0 bg-white/95 backdrop-blur-sm p-4 z-40 flex items-center gap-4 shadow-sm shadow-black/[0.02]">
+      {/* Sticky Header - Offset to align with Layout header */}
+      <div className="sticky top-0 bg-white/95 backdrop-blur-sm p-4 z-40 flex items-center gap-4 shadow-sm shadow-black/[0.02] border-b border-black/[0.02]">
         <button onClick={onBack} className="p-3 bg-white rounded-[10px] shadow-sm border border-black/[0.03] hover:scale-110 active:scale-95 transition-all">
           <ICONS.Back />
         </button>
@@ -89,7 +82,7 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
       </div>
 
       {/* Language Switcher */}
-      <div className="px-6 py-4 sticky top-[75px] bg-white/95 backdrop-blur-sm z-30">
+      <div className="px-6 py-4 sticky top-[73px] bg-white/95 backdrop-blur-sm z-30">
         <div className="bg-white p-1.5 rounded-[10px] flex shadow-md shadow-black/[0.03] border border-black/[0.03]">
           <button 
             onClick={() => setTab('bn')}
@@ -201,7 +194,6 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
           </>
         )}
       </div>
-      <div className="h-32"></div> {/* Bottom navigation buffer */}
     </div>
   );
 };

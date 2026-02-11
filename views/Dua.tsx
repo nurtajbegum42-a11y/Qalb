@@ -53,8 +53,8 @@ const DuaView: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full animate-in slide-in-from-bottom-2 duration-500">
-      {/* Search and Tabs Header */}
-      <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-30 p-6 space-y-6 shadow-sm shadow-black/[0.02]">
+      {/* Search and Tabs Header - Offset for Layout header */}
+      <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-30 p-6 space-y-6 shadow-sm shadow-black/[0.02] border-b border-black/[0.02]">
         <div className="relative">
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
             <ICONS.Search />
@@ -91,7 +91,7 @@ const DuaView: React.FC = () => {
       </div>
 
       {/* List Content */}
-      <div className="p-6 space-y-6 pb-32">
+      <div className="p-6 space-y-6">
         {filteredDuas.length > 0 ? (
           filteredDuas.map((dua) => {
             const isBookmarked = bookmarks.includes(dua.id);
