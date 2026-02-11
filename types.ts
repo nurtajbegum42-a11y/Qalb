@@ -12,7 +12,6 @@ export interface PrayerTimings {
   Lastthird: string;
 }
 
-// Fixed: Added Surah interface for Quran functionality
 export interface Surah {
   number: number;
   name: string;
@@ -22,7 +21,6 @@ export interface Surah {
   revelationType: string;
 }
 
-// Fixed: Added Ayah interface with optional translation and tafsir fields
 export interface Ayah {
   number: number;
   text: string;
@@ -56,3 +54,8 @@ export interface Dua {
 }
 
 export type View = 'home' | 'prayer' | 'dua' | 'quran' | 'surah-detail';
+
+export interface NotificationSettings {
+  enabled: boolean;
+  soundEnabled: boolean;
+}

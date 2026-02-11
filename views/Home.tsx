@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchPrayerTimings, getNextPrayer } from '../services/prayerService';
 import { fetchAyahDetail } from '../services/quranService';
 import { cacheService } from '../services/cacheService';
+import { notificationService } from '../services/notificationService';
 import { PrayerTimings, Ayah } from '../types';
 import { DAILY_DUAS } from '../constants';
 
@@ -19,17 +20,13 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const loadData = () => {
-      // Load Prayer Timings & Location Name
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const { latitude: lat, longitude: lng } = pos.coords;
-          
-          // Fetch Prayer Timings
           fetchPrayerTimings(lat, lng)
             .then(setTimings)
             .catch(() => setLocationError("API Error. Please try again."));
 
-          // Reverse Geocode for City Name
           fetch(`https://api.bigdatacoloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`)
             .then(res => res.json())
             .then(data => {
@@ -45,7 +42,6 @@ const Home: React.FC = () => {
         }
       );
 
-      // Load Daily Tafsir
       const dateKey = new Date().toISOString().split('T')[0];
       const cacheKey = `daily_tafsir_${dateKey}`;
       const cachedTafsir = cacheService.get<Ayah>(cacheKey);
@@ -53,15 +49,11 @@ const Home: React.FC = () => {
       if (cachedTafsir) {
         setDailyTafsir(cachedTafsir);
       } else {
-        const start = new Date(new Date().getFullYear(), 0, 0);
-        const diff = new Date().getTime() - start.getTime();
-        const oneDay = 1000 * 60 * 60 * 24;
-        const dayOfYear = Math.floor(diff / oneDay);
-        
         const meaningfulAyahs = [
           [1, 1], [2, 255], [2, 286], [3, 191], [4, 135], [5, 3], [6, 162], [7, 54],
           [8, 2], [9, 128], [10, 62], [11, 114], [12, 101], [13, 28], [14, 7], [15, 9]
         ];
+        const dayOfYear = Math.floor((new Date().getTime() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
         const [s, a] = meaningfulAyahs[dayOfYear % meaningfulAyahs.length];
         
         fetchAyahDetail(s, a).then(data => {
@@ -81,7 +73,11 @@ const Home: React.FC = () => {
       setNow(currentTime);
 
       if (timings) {
-        // 1. Calculate Next Prayer
+        // Notification Check
+        if (localStorage.getItem('qalb_notifs') === 'true') {
+          notificationService.checkTimings(timings);
+        }
+
         const next = getNextPrayer(timings);
         setNextPrayer(next);
         
@@ -94,19 +90,14 @@ const Home: React.FC = () => {
           setCountdown(`${hours}:${mins}:${secs}`);
         }
 
-        // 2. Calculate Current Active Prayer
         const prayerKeys = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] as const;
-        let current = 'Isha'; // Default to Isha for late night/pre-fajr
+        let current = 'Isha';
         for (const key of prayerKeys) {
           const [h, m] = timings[key].split(':').map(Number);
           const pTime = new Date(currentTime);
           pTime.setHours(h, m, 0, 0);
-          
-          if (currentTime >= pTime) {
-            current = key;
-          } else {
-            break; 
-          }
+          if (currentTime >= pTime) current = key;
+          else break; 
         }
         setCurrentPrayer(current);
       }
@@ -125,7 +116,6 @@ const Home: React.FC = () => {
 
   return (
     <div className="p-6 space-y-8 animate-in fade-in duration-700">
-      {/* 1. Daily Changing Banner */}
       <section className="bg-white rounded-[10px] p-6 shadow-md shadow-black/[0.03] space-y-4 border border-black/[0.03]">
         <div className="flex justify-between items-center border-b border-black/[0.03] pb-3">
           <span className="text-[10px] font-black uppercase tracking-[0.2em]">Dua of the Day</span>
@@ -138,7 +128,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. Next Prayer with Live Countdown & Location */}
       <section className="space-y-4">
         <div className="flex justify-between items-end px-2">
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Coming Up Next</h3>
@@ -148,7 +137,6 @@ const Home: React.FC = () => {
           <div className="bg-white rounded-[10px] p-6 text-center text-xs uppercase tracking-widest shadow-sm border border-black/[0.03]">{locationError}</div>
         ) : (
           <div className="bg-white rounded-[10px] p-8 flex flex-col items-center justify-center space-y-4 shadow-lg shadow-black/[0.03] border border-black/[0.03]">
-            {/* Current Clock and Active Salah */}
             <div className="flex flex-col items-center">
               <span className="text-[8px] font-black uppercase tracking-[0.4em] opacity-20 mb-1">Current Time</span>
               <div className="flex items-baseline gap-2">
@@ -158,10 +146,7 @@ const Home: React.FC = () => {
                 )}
               </div>
             </div>
-
             <div className="h-[1px] w-12 bg-black/5"></div>
-
-            {/* Prayer Name & Countdown */}
             <div className="flex flex-col items-center space-y-3">
               <span className="text-5xl font-black uppercase tracking-tighter leading-none">{nextPrayer?.name || '---'}</span>
               <div className="flex flex-col items-center">
@@ -173,7 +158,6 @@ const Home: React.FC = () => {
         )}
       </section>
 
-      {/* 3. Sehri and Iftar Times */}
       <section className="grid grid-cols-2 gap-4">
         <div className="bg-white rounded-[10px] p-6 flex flex-col items-center shadow-sm shadow-black/[0.02] border border-black/[0.03]">
           <span className="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-50">Sehri</span>
@@ -185,7 +169,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. Horizontal Slider with Daily Useful Duas */}
       <section className="space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 px-2">Useful Remembrances</h3>
         <div className="flex overflow-x-auto gap-4 snap-x no-scrollbar">
@@ -202,7 +185,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. Tafsir of the Day */}
       <section className="space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 px-2">Tafsir of the Day</h3>
         <div className="bg-white rounded-[10px] p-6 shadow-lg shadow-black/[0.04] border border-black/[0.05] space-y-6">
@@ -214,31 +196,19 @@ const Home: React.FC = () => {
                   <span className="text-[8px] opacity-40 font-black uppercase tracking-widest">Ayah {dailyTafsir.numberInSurah}</span>
                 </div>
                 <div className="bg-black/5 p-1 rounded-[8px] flex">
-                  <button 
-                    onClick={() => setTafsirTab('bn')}
-                    className={`px-3 py-1.5 text-[8px] font-black uppercase tracking-widest rounded-[6px] transition-all ${tafsirTab === 'bn' ? 'bg-black text-white' : 'opacity-40'}`}
-                  >BN</button>
-                  <button 
-                    onClick={() => setTafsirTab('en')}
-                    className={`px-3 py-1.5 text-[8px] font-black uppercase tracking-widest rounded-[6px] transition-all ${tafsirTab === 'en' ? 'bg-black text-white' : 'opacity-40'}`}
-                  >EN</button>
+                  <button onClick={() => setTafsirTab('bn')} className={`px-3 py-1.5 text-[8px] font-black uppercase tracking-widest rounded-[6px] transition-all ${tafsirTab === 'bn' ? 'bg-black text-white' : 'opacity-40'}`}>BN</button>
+                  <button onClick={() => setTafsirTab('en')} className={`px-3 py-1.5 text-[8px] font-black uppercase tracking-widest rounded-[6px] transition-all ${tafsirTab === 'en' ? 'bg-black text-white' : 'opacity-40'}`}>EN</button>
                 </div>
               </div>
-
               <p className="text-right font-arabic text-2xl leading-loose" dir="rtl">{dailyTafsir.text}</p>
-              
               <div className="space-y-4 bg-black/[0.01] p-4 rounded-[10px] border border-black/[0.02]">
                 <div>
                   <span className="text-[8px] font-black uppercase tracking-widest opacity-30 block mb-1">Translation</span>
-                  <p className="text-xs font-bold leading-relaxed">
-                    {tafsirTab === 'bn' ? dailyTafsir.translation_bn : dailyTafsir.translation_en}
-                  </p>
+                  <p className="text-xs font-bold leading-relaxed">{tafsirTab === 'bn' ? dailyTafsir.translation_bn : dailyTafsir.translation_en}</p>
                 </div>
                 <div>
                   <span className="text-[8px] font-black uppercase tracking-widest opacity-30 block mb-1">In-depth Tafsir</span>
-                  <p className="text-[11px] leading-relaxed opacity-80">
-                    {tafsirTab === 'bn' ? dailyTafsir.tafsir_bn : dailyTafsir.tafsir_en}
-                  </p>
+                  <p className="text-[11px] leading-relaxed opacity-80">{tafsirTab === 'bn' ? dailyTafsir.tafsir_bn : dailyTafsir.tafsir_en}</p>
                 </div>
               </div>
             </>
@@ -251,27 +221,13 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 6. Footer / Credit Section */}
       <footer className="pt-10 pb-32 border-t border-black/[0.03] flex flex-col items-center justify-center space-y-4 text-center">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-20 px-6">
-          © 2024-25 QALB. ALL RIGHTS RESERVED.
-        </p>
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-20 px-6">© 2024-25 QALB. ALL RIGHTS RESERVED.</p>
         <div className="space-y-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">
-            CREDIT: <span className="text-black">CODENEST25</span>
-          </p>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">
-            DEVELOPER: <span className="text-black">@SIAMAFRID</span>
-          </p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">CREDIT: <span className="text-black">CODENEST25</span></p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">DEVELOPER: <span className="text-black">@SIAMAFRID</span></p>
         </div>
-        <a 
-          href="/privacy.html" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="text-[9px] font-black uppercase tracking-[0.2em] text-black/30 underline decoration-black/10 underline-offset-4"
-        >
-          Privacy Policy
-        </a>
+        <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="text-[9px] font-black uppercase tracking-[0.2em] text-black/30 underline decoration-black/10 underline-offset-4">Privacy Policy</a>
       </footer>
     </div>
   );

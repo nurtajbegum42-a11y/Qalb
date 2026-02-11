@@ -1,7 +1,6 @@
 
-const CACHE_NAME = 'qalb-v3-core';
+const CACHE_NAME = 'qalb-v4-core';
 
-// Assets that must be available for the app to "boot" offline
 const PRE_CACHE = [
   '/',
   '/index.html',
@@ -32,8 +31,20 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Handle notification click to open the app
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      if (clientList.length > 0) {
+        return clientList[0].focus();
+      }
+      return clients.openWindow('/');
+    })
+  );
+});
+
 self.addEventListener('fetch', (event) => {
-  // Navigation request (e.g. user refreshes the page)
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => {
@@ -64,7 +75,6 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         }).catch(() => null);
 
-        // Return cached version immediately if available, otherwise wait for network
         return cachedResponse || networkFetch;
       })
     );
