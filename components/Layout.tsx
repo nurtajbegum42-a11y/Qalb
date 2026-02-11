@@ -1,35 +1,18 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ICONS } from '../constants';
 import { View } from '../types';
-import { notificationService } from '../services/notificationService';
 
 interface LayoutProps {
   children: React.ReactNode;
   currentView: View;
   onNavigate: (view: View) => void;
   title?: string;
+  notifsEnabled: boolean;
+  onToggleNotifs: () => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, currentView, onNavigate, title }) => {
-  const [notifsEnabled, setNotifsEnabled] = useState(localStorage.getItem('qalb_notifs') === 'true');
-
-  const toggleNotifs = async () => {
-    if (!notifsEnabled) {
-      const granted = await notificationService.requestPermission();
-      if (granted) {
-        setNotifsEnabled(true);
-        localStorage.setItem('qalb_notifs', 'true');
-        notificationService.playBell();
-      } else {
-        alert("Please enable notifications in your browser settings.");
-      }
-    } else {
-      setNotifsEnabled(false);
-      localStorage.setItem('qalb_notifs', 'false');
-    }
-  };
-
+const Layout: React.FC<LayoutProps> = ({ children, currentView, onNavigate, title, notifsEnabled, onToggleNotifs }) => {
   return (
     <div className="flex flex-col h-screen max-w-md mx-auto bg-white border-x border-black/5 relative">
       {/* Header */}
@@ -39,7 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onNavigate, titl
           <div className="flex items-center gap-3">
             <h1 className="text-sm font-black tracking-tight uppercase text-black">{title || 'Home'}</h1>
             <button 
-              onClick={toggleNotifs}
+              onClick={onToggleNotifs}
               className={`p-1.5 rounded-full transition-all ${notifsEnabled ? 'bg-black text-white' : 'bg-black/5 text-black/20'}`}
               title={notifsEnabled ? "Notifications On" : "Notifications Off"}
             >

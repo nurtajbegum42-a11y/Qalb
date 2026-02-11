@@ -1,19 +1,20 @@
 
 import React, { useState, useEffect } from 'react';
-import { fetchPrayerTimings, getNextPrayer } from '../services/prayerService';
+import { getNextPrayer } from '../services/prayerService';
 import { fetchAyahDetail } from '../services/quranService';
 import { cacheService } from '../services/cacheService';
-import { notificationService } from '../services/notificationService';
 import { PrayerTimings, Ayah } from '../types';
 import { DAILY_DUAS } from '../constants';
 
-const Home: React.FC = () => {
-  const [timings, setTimings] = useState<PrayerTimings | null>(null);
+interface HomeProps {
+  timingsFromParent: PrayerTimings | null;
+}
+
+const Home: React.FC<HomeProps> = ({ timingsFromParent }) => {
   const [nextPrayer, setNextPrayer] = useState<{ name: string; time: Date } | null>(null);
   const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<string>('00:00:00');
   const [now, setNow] = useState<Date>(new Date());
-  const [locationError, setLocationError] = useState<string | null>(null);
   const [locationName, setLocationName] = useState<string>('Locating...');
   const [dailyTafsir, setDailyTafsir] = useState<Ayah | null>(null);
   const [tafsirTab, setTafsirTab] = useState<'bn' | 'en'>('bn');
@@ -23,10 +24,6 @@ const Home: React.FC = () => {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const { latitude: lat, longitude: lng } = pos.coords;
-          fetchPrayerTimings(lat, lng)
-            .then(setTimings)
-            .catch(() => setLocationError("API Error. Please try again."));
-
           fetch(`https://api.bigdatacoloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`)
             .then(res => res.json())
             .then(data => {
@@ -35,10 +32,6 @@ const Home: React.FC = () => {
               setLocationName(`${city}${country ? `, ${country}` : ''}`);
             })
             .catch(() => setLocationName("Location Set"));
-        },
-        () => {
-          setLocationError("Enable Location for accurate timings.");
-          setLocationName("Global");
         }
       );
 
@@ -72,13 +65,8 @@ const Home: React.FC = () => {
       const currentTime = new Date();
       setNow(currentTime);
 
-      if (timings) {
-        // Notification Check
-        if (localStorage.getItem('qalb_notifs') === 'true') {
-          notificationService.checkTimings(timings);
-        }
-
-        const next = getNextPrayer(timings);
+      if (timingsFromParent) {
+        const next = getNextPrayer(timingsFromParent);
         setNextPrayer(next);
         
         const diff = next.time.getTime() - currentTime.getTime();
@@ -93,7 +81,7 @@ const Home: React.FC = () => {
         const prayerKeys = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] as const;
         let current = 'Isha';
         for (const key of prayerKeys) {
-          const [h, m] = timings[key].split(':').map(Number);
+          const [h, m] = timingsFromParent[key].split(':').map(Number);
           const pTime = new Date(currentTime);
           pTime.setHours(h, m, 0, 0);
           if (currentTime >= pTime) current = key;
@@ -103,7 +91,7 @@ const Home: React.FC = () => {
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [timings]);
+  }, [timingsFromParent]);
 
   const formattedTime = now.toLocaleTimeString([], { 
     hour: '2-digit', 
@@ -133,8 +121,8 @@ const Home: React.FC = () => {
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Coming Up Next</h3>
           <span className="text-[8px] font-black uppercase tracking-widest opacity-30">{locationName}</span>
         </div>
-        {locationError ? (
-          <div className="bg-white rounded-[10px] p-6 text-center text-xs uppercase tracking-widest shadow-sm border border-black/[0.03]">{locationError}</div>
+        {!timingsFromParent ? (
+          <div className="bg-white rounded-[10px] p-6 text-center text-xs uppercase tracking-widest shadow-sm border border-black/[0.03]">Locating Timings...</div>
         ) : (
           <div className="bg-white rounded-[10px] p-8 flex flex-col items-center justify-center space-y-4 shadow-lg shadow-black/[0.03] border border-black/[0.03]">
             <div className="flex flex-col items-center">
@@ -161,11 +149,11 @@ const Home: React.FC = () => {
       <section className="grid grid-cols-2 gap-4">
         <div className="bg-white rounded-[10px] p-6 flex flex-col items-center shadow-sm shadow-black/[0.02] border border-black/[0.03]">
           <span className="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-50">Sehri</span>
-          <span className="text-2xl font-black">{timings?.Imsak || '--:--'}</span>
+          <span className="text-2xl font-black">{timingsFromParent?.Imsak || '--:--'}</span>
         </div>
         <div className="bg-white rounded-[10px] p-6 flex flex-col items-center shadow-sm shadow-black/[0.02] border border-black/[0.03]">
           <span className="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-50">Iftar</span>
-          <span className="text-2xl font-black">{timings?.Maghrib || '--:--'}</span>
+          <span className="text-2xl font-black">{timingsFromParent?.Maghrib || '--:--'}</span>
         </div>
       </section>
 
@@ -222,7 +210,7 @@ const Home: React.FC = () => {
       </section>
 
       <footer className="pt-10 pb-32 border-t border-black/[0.03] flex flex-col items-center justify-center space-y-4 text-center">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-20 px-6">© 2024-25 QALB. ALL RIGHTS RESERVED.</p>
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-20 px-6">© 2026 QALB. ALL RIGHTS RESERVED.</p>
         <div className="space-y-1">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">CREDIT: <span className="text-black">CODENEST25</span></p>
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">DEVELOPER: <span className="text-black">@SIAMAFRID</span></p>

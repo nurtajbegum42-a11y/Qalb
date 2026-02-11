@@ -1,20 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
-import { fetchPrayerTimings } from '../services/prayerService';
 import { PrayerTimings } from '../types';
 import { PRAYER_NAMES, DAILY_DUAS } from '../constants';
 
-const PrayerTimes: React.FC = () => {
-  const [timings, setTimings] = useState<PrayerTimings | null>(null);
+interface PrayerTimesProps {
+  timingsFromParent: PrayerTimings | null;
+}
+
+const PrayerTimes: React.FC<PrayerTimesProps> = ({ timingsFromParent }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      fetchPrayerTimings(pos.coords.latitude, pos.coords.longitude)
-        .then(setTimings)
-        .catch(console.error);
-    });
-
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
@@ -43,11 +39,11 @@ const PrayerTimes: React.FC = () => {
             <div key={name} className="bg-white rounded-[10px] p-6 flex justify-between items-center group shadow-sm shadow-black/[0.02] border border-black/[0.03] active:scale-[0.98] transition-all">
               <div>
                 <div className="text-[10px] font-black uppercase tracking-widest opacity-40">{name}</div>
-                <div className="text-3xl font-black">{timings ? (timings as any)[name] : '--:--'}</div>
+                <div className="text-3xl font-black">{timingsFromParent ? (timingsFromParent as any)[name] : '--:--'}</div>
               </div>
               <div className="text-right">
                 <div className="text-[9px] uppercase font-black tracking-widest opacity-30 mb-1">Countdown</div>
-                <div className="text-xs font-mono bg-black text-white px-3 py-1 rounded-[10px]">{timings ? getCountdown(name, (timings as any)[name]) : '--'}</div>
+                <div className="text-xs font-mono bg-black text-white px-3 py-1 rounded-[10px]">{timingsFromParent ? getCountdown(name, (timingsFromParent as any)[name]) : '--'}</div>
               </div>
             </div>
           ))}
