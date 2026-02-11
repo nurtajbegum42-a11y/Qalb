@@ -8,7 +8,7 @@
       "namespace": "android_app",
       "package_name": "com.codenest25.qalb",
       "sha256_cert_fingerprints": [
-        "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
+        "YOUR_SHA256_FINGERPRINT_HERE"
       ]
     }
   }
