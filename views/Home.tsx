@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { getNextPrayer } from '../services/prayerService';
-import { fetchAyahDetail } from '../services/quranService';
-import { cacheService } from '../services/cacheService';
-import { PrayerTimings, Ayah } from '../types';
-import { DAILY_DUAS } from '../constants';
+import { getNextPrayer } from '../services/prayerService.ts';
+import { fetchAyahDetail } from '../services/quranService.ts';
+import { cacheService } from '../services/cacheService.ts';
+import { PrayerTimings, Ayah } from '../types.ts';
+import { DAILY_DUAS } from '../constants.tsx';
 
 interface HomeProps {
   timingsFromParent: PrayerTimings | null;

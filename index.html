@@ -27,7 +27,6 @@
             -webkit-user-select: none;
             scrollbar-width: none;
         }
-        /* Enable text selection only for specific content like translations */
         .selectable {
             user-select: text;
             -webkit-user-select: text;
@@ -41,7 +40,7 @@
             overflow: hidden;
             margin: 0;
             padding: 0;
-            overscroll-behavior: none; /* Critical for Android native feel */
+            overscroll-behavior: none;
         }
         #root {
             height: 100%;
@@ -54,7 +53,6 @@
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
-        /* Mobile Native Polish */
         .safe-top { padding-top: var(--sat); }
         .safe-bottom { padding-bottom: var(--sab); }
         
@@ -63,8 +61,6 @@
             flex: 1;
             overflow-y: auto;
         }
-
-        /* Active states for buttons */
         button:active {
             opacity: 0.6;
             transform: scale(0.97);
@@ -82,5 +78,7 @@
 </head>
 <body>
     <div id="root"></div>
+    <!-- Entry point script -->
+    <script type="module" src="./index.tsx"></script>
 </body>
 </html>

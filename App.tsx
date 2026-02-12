@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import Layout from './components/Layout';
-import Home from './views/Home';
-import PrayerTimes from './views/PrayerTimes';
-import DuaView from './views/Dua';
-import Quran from './views/Quran';
-import SurahDetail from './views/SurahDetail';
-import { View, Surah, PrayerTimings } from './types';
-import { notificationService } from './services/notificationService';
-import { fetchPrayerTimings } from './services/prayerService';
+import Layout from './components/Layout.tsx';
+import Home from './views/Home.tsx';
+import PrayerTimes from './views/PrayerTimes.tsx';
+import DuaView from './views/Dua.tsx';
+import Quran from './views/Quran.tsx';
+import SurahDetail from './views/SurahDetail.tsx';
+import { View, Surah, PrayerTimings } from './types.ts';
+import { notificationService } from './services/notificationService.ts';
+import { fetchPrayerTimings } from './services/prayerService.ts';
 
 const SplashScreen: React.FC = () => (
   <div className="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center">
@@ -83,8 +83,7 @@ const App: React.FC = () => {
           .then(setGlobalTimings)
           .catch(err => console.error("Timings Fetch Error:", err));
       }, (err) => {
-        console.warn("Location permission denied on Android.");
-        // Fallback or message can go here
+        console.warn("Location permission denied.");
       }, { timeout: 10000 });
     }
   };

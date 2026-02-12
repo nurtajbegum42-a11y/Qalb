@@ -1,6 +1,6 @@
 
-import { Surah, Ayah } from '../types';
-import { cacheService } from './cacheService';
+import { Surah, Ayah } from '../types.ts';
+import { cacheService } from './cacheService.ts';
 
 export const fetchSurahs = async (): Promise<Surah[]> => {
   const cacheKey = 'surah_list';
@@ -63,7 +63,7 @@ export const fetchFullSurah = async (number: number): Promise<Ayah[]> => {
       };
     });
 
-    cacheService.set(cacheKey, formattedAyahs, -1); // Cache permanently (offline library)
+    cacheService.set(cacheKey, formattedAyahs, -1); // Cache permanently
     return formattedAyahs;
   } catch (error) {
     console.error("Quran Fetch Error:", error);

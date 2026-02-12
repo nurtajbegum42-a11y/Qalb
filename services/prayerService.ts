@@ -1,6 +1,6 @@
 
-import { PrayerTimings } from '../types';
-import { cacheService } from './cacheService';
+import { PrayerTimings } from '../types.ts';
+import { cacheService } from './cacheService.ts';
 
 export const fetchPrayerTimings = async (lat: number, lng: number): Promise<PrayerTimings> => {
   const dateKey = new Date().toISOString().split('T')[0];
