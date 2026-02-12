@@ -23,13 +23,7 @@
         * {
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
-            user-select: none;
-            -webkit-user-select: none;
             scrollbar-width: none;
-        }
-        .selectable {
-            user-select: text;
-            -webkit-user-select: text;
         }
         html, body {
             height: 100%;
@@ -38,6 +32,12 @@
             overflow: hidden;
             background-color: white;
             overscroll-behavior-y: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .selectable {
+            -webkit-user-select: text;
+            user-select: text;
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -57,14 +57,13 @@
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
-        .safe-top { padding-top: var(--sat); }
-        .safe-bottom { padding-bottom: var(--sab); }
         
         main {
-            -webkit-overflow-scrolling: touch;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             overscroll-behavior-y: contain;
         }
+        
         button:active {
             opacity: 0.6;
             transform: scale(0.97);

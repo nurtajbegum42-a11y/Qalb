@@ -65,9 +65,9 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
 
   return (
     <div className="bg-white animate-in slide-in-from-right duration-400">
-      {/* Sticky Header */}
-      <div className="sticky top-0 bg-white/95 backdrop-blur-sm p-4 z-40 flex items-center gap-4 shadow-sm shadow-black/[0.02] border-b border-black/[0.02]">
-        <button onClick={onBack} className="p-3 bg-white rounded-[10px] shadow-sm border border-black/[0.03] hover:scale-110 active:scale-95 transition-all">
+      {/* Header Info - Scrolling with content for best mobile compatibility */}
+      <div className="p-4 bg-white flex items-center gap-4 border-b border-black/[0.02]">
+        <button onClick={onBack} className="p-3 bg-white rounded-[10px] shadow-sm border border-black/[0.03] active:scale-95 transition-all">
           <ICONS.Back />
         </button>
         <div className="flex-1 overflow-hidden">
@@ -79,8 +79,8 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
         </div>
       </div>
 
-      {/* Language Switcher */}
-      <div className="px-6 py-4 sticky top-[73px] bg-white/95 backdrop-blur-sm z-30">
+      {/* Language Toggle */}
+      <div className="px-6 py-4 bg-white">
         <div className="bg-white p-1.5 rounded-[10px] flex shadow-md shadow-black/[0.03] border border-black/[0.03]">
           <button 
             onClick={() => setTab('bn')}
@@ -97,7 +97,7 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
         </div>
       </div>
 
-      {/* Ayah List */}
+      {/* Main List */}
       <div className="p-6 space-y-10">
         {loading ? (
           <div className="py-24 flex flex-col items-center gap-4">
@@ -125,23 +125,21 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
                       {playingAyahNumber === ayah.number ? <ICONS.Pause /> : <ICONS.Play />}
                     </button>
                   </div>
-                  <p className="text-right font-arabic text-3xl leading-[2.8] flex-1 text-black" dir="rtl">
+                  <p className="text-right font-arabic text-3xl leading-[2.8] flex-1 text-black selectable" dir="rtl">
                     {ayah.text}
                   </p>
                 </div>
                 
                 <div className="space-y-4">
-                  {/* Translation Card */}
                   <div className="bg-white rounded-[10px] p-6 shadow-sm shadow-black/[0.02] border-l-4 border-black border-y border-r border-black/[0.03]">
                     <span className="text-[8px] font-black uppercase tracking-widest opacity-30 block mb-2">
                       {tab === 'bn' ? 'অনুবাদ' : 'Translation'}
                     </span>
-                    <p className="text-sm font-bold leading-relaxed">
+                    <p className="text-sm font-bold leading-relaxed selectable">
                       {tab === 'bn' ? ayah.translation_bn : ayah.translation_en}
                     </p>
                   </div>
                   
-                  {/* Actions */}
                   <div className="grid grid-cols-2 gap-3">
                     <button 
                       onClick={() => toggleSection(ayah.number, 'tafsir')}
@@ -158,16 +156,15 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
                     </button>
                   </div>
 
-                  {/* Expanded Content */}
                   {expandedSection[ayah.number] && (
                     <div className="bg-white rounded-[10px] border border-black/[0.05] p-6 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
                       <div className="space-y-4">
                         <span className="text-[8px] font-black uppercase tracking-widest opacity-50 block">
                           {expandedSection[ayah.number] === 'tafsir' 
-                            ? (tab === 'bn' ? 'বিস্তারিত তাফসীর ও ব্যাখ্যা' : 'In-depth Commentary & Tafsir') 
-                            : (tab === 'bn' ? 'এই আয়াতের ব্যবহারিক শিক্ষা' : 'Practical Lessons from Ayah')}
+                            ? (tab === 'bn' ? 'তাফসীর' : 'Tafsir') 
+                            : (tab === 'bn' ? 'শিক্ষা' : 'Lesson')}
                         </span>
-                        <p className="text-xs leading-relaxed opacity-90 font-medium whitespace-pre-wrap">
+                        <p className="text-xs leading-relaxed opacity-90 font-medium whitespace-pre-wrap selectable">
                           {expandedSection[ayah.number] === 'tafsir' 
                             ? (tab === 'bn' ? ayah.tafsir_bn : ayah.tafsir_en)
                             : (tab === 'bn' ? ayah.lesson_bn : ayah.lesson_en)

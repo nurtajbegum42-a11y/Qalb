@@ -51,8 +51,8 @@ const DuaView: React.FC = () => {
 
   return (
     <div className="animate-in slide-in-from-bottom-2 duration-500">
-      {/* Search and Tabs Header */}
-      <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-30 p-6 space-y-6 shadow-sm shadow-black/[0.02] border-b border-black/[0.02]">
+      {/* Controls Container - Non-sticky for maximum scrolling reliability */}
+      <div className="p-6 space-y-6 bg-white border-b border-black/[0.02]">
         <div className="relative">
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
             <ICONS.Search />
@@ -77,7 +77,7 @@ const DuaView: React.FC = () => {
             onClick={() => setActiveTab('ruqyah')}
             className={`flex-1 py-3 text-[9px] font-black uppercase tracking-[0.1em] rounded-[8px] transition-all duration-300 ${activeTab === 'ruqyah' ? 'bg-black text-white shadow-md' : 'opacity-40'}`}
           >
-            Rukaiya
+            Ruqyah
           </button>
           <button 
             onClick={() => setActiveTab('bookmarks')}
@@ -88,7 +88,7 @@ const DuaView: React.FC = () => {
         </div>
       </div>
 
-      {/* List Content */}
+      {/* Scrollable List Content */}
       <div className="p-6 space-y-6">
         {filteredDuas.length > 0 ? (
           filteredDuas.map((dua) => {
@@ -108,23 +108,23 @@ const DuaView: React.FC = () => {
                   </button>
                 </div>
                 
-                <p className="text-right font-arabic text-2xl leading-loose py-2" dir="rtl">{dua.arabic}</p>
+                <p className="text-right font-arabic text-2xl leading-loose py-2 selectable" dir="rtl">{dua.arabic}</p>
                 
                 <div className="space-y-4 pt-2 border-t border-black/[0.01]">
                   <div>
                     <span className="text-[8px] font-black uppercase tracking-widest block opacity-30 mb-1">Bangla Meaning</span>
-                    <p className="text-sm font-medium leading-relaxed text-black/90">{dua.bangla}</p>
+                    <p className="text-sm font-medium leading-relaxed text-black/90 selectable">{dua.bangla}</p>
                   </div>
                   <div>
                     <span className="text-[8px] font-black uppercase tracking-widest block opacity-30 mb-1">English Translation</span>
-                    <p className="text-sm italic opacity-70 leading-relaxed text-black/80">{dua.english}</p>
+                    <p className="text-sm italic opacity-70 leading-relaxed text-black/80 selectable">{dua.english}</p>
                   </div>
                   
                   {(dua.benefit_bn || dua.benefit_en) && (
                     <div className="p-4 bg-black/[0.02] rounded-[8px] border border-black/[0.03] space-y-2">
-                       <span className="text-[8px] font-black uppercase tracking-widest opacity-50 block mb-1">Benefit / Reason (কেন পড়বেন)</span>
-                       {dua.benefit_bn && <p className="text-[11px] leading-relaxed font-bold">{dua.benefit_bn}</p>}
-                       {dua.benefit_en && <p className="text-[11px] leading-relaxed italic opacity-70">{dua.benefit_en}</p>}
+                       <span className="text-[8px] font-black uppercase tracking-widest opacity-50 block mb-1">Benefit</span>
+                       {dua.benefit_bn && <p className="text-[11px] leading-relaxed font-bold selectable">{dua.benefit_bn}</p>}
+                       {dua.benefit_en && <p className="text-[11px] leading-relaxed italic opacity-70 selectable">{dua.benefit_en}</p>}
                     </div>
                   )}
                 </div>
@@ -147,17 +147,9 @@ const DuaView: React.FC = () => {
             </div>
             <p className="text-[10px] uppercase font-black tracking-widest opacity-30">
               {activeTab === 'bookmarks' 
-                ? "Your bookmarked collection is empty" 
-                : "No matching remembrances found"}
+                ? "No saved remembrances" 
+                : "No matching results found"}
             </p>
-            {activeTab === 'bookmarks' && (
-              <button 
-                onClick={() => setActiveTab('all')}
-                className="text-[9px] uppercase font-black tracking-widest border border-black px-4 py-2 rounded-[8px] active:bg-black active:text-white transition-all"
-              >
-                Browse All Duas
-              </button>
-            )}
           </div>
         )}
       </div>
