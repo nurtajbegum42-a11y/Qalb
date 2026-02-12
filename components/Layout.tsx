@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { ICONS } from '../constants';
-import { View } from '../types';
+import { ICONS } from '../constants.tsx';
+import { View } from '../types.ts';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -39,13 +39,13 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onNavigate, titl
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto no-scrollbar relative pt-2">
+      <main className="flex-1 overflow-y-auto no-scrollbar relative">
         <div className="max-w-md mx-auto w-full pb-40">
           {children}
         </div>
       </main>
 
-      {/* Bottom Nav with Android Gesture Bar support */}
+      {/* Bottom Nav */}
       <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-6 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none">
         <nav className="max-w-sm mx-auto bg-white text-black shadow-2xl shadow-black/15 rounded-[22px] flex justify-around py-4 px-2 pointer-events-auto border border-black/[0.08]">
           <button 

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Dua } from './types';
+import { Dua } from './types.ts';
 
 export const DAILY_DUAS: Dua[] = [
   {

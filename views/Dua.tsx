@@ -1,15 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { ALL_DUAS } from '../services/duaService';
-import { ICONS } from '../constants';
-import { Dua } from '../types';
+import { ALL_DUAS } from '../services/duaService.ts';
+import { ICONS } from '../constants.tsx';
+import { Dua } from '../types.ts';
 
 const DuaView: React.FC = () => {
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'ruqyah' | 'bookmarks'>('all');
   const [bookmarks, setBookmarks] = useState<number[]>([]);
 
-  // Initialize bookmarks from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('qalb_bookmarks');
     if (saved) {
@@ -21,7 +20,6 @@ const DuaView: React.FC = () => {
     }
   }, []);
 
-  // Save bookmarks to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('qalb_bookmarks', JSON.stringify(bookmarks));
   }, [bookmarks]);
@@ -52,8 +50,8 @@ const DuaView: React.FC = () => {
   const filteredDuas = getFilteredDuas();
 
   return (
-    <div className="flex flex-col h-full animate-in slide-in-from-bottom-2 duration-500">
-      {/* Search and Tabs Header - Offset for Layout header */}
+    <div className="animate-in slide-in-from-bottom-2 duration-500">
+      {/* Search and Tabs Header */}
       <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-30 p-6 space-y-6 shadow-sm shadow-black/[0.02] border-b border-black/[0.02]">
         <div className="relative">
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">

@@ -31,21 +31,25 @@
             user-select: text;
             -webkit-user-select: text;
         }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: white;
-            color: black;
-            height: 100vh;
-            height: -webkit-fill-available;
-            overflow: hidden;
+        html, body {
+            height: 100%;
             margin: 0;
             padding: 0;
-            overscroll-behavior: none;
+            overflow: hidden;
+            background-color: white;
+            overscroll-behavior-y: none;
         }
-        #root {
-            height: 100%;
+        body {
+            font-family: 'Inter', sans-serif;
+            color: black;
             display: flex;
             flex-direction: column;
+        }
+        #root {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
         .font-arabic {
             font-family: 'Amiri', serif;
@@ -58,8 +62,8 @@
         
         main {
             -webkit-overflow-scrolling: touch;
-            flex: 1;
             overflow-y: auto;
+            overscroll-behavior-y: contain;
         }
         button:active {
             opacity: 0.6;
@@ -78,7 +82,6 @@
 </head>
 <body>
     <div id="root"></div>
-    <!-- Entry point script -->
     <script type="module" src="./index.tsx"></script>
 </body>
 </html>

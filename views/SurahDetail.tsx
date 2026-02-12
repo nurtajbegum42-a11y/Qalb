@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Surah, Ayah } from '../types';
-import { fetchFullSurah } from '../services/quranService';
-import { ICONS } from '../constants';
+import { Surah, Ayah } from '../types.ts';
+import { fetchFullSurah } from '../services/quranService.ts';
+import { ICONS } from '../constants.tsx';
 
 interface SurahDetailProps {
   surah: Surah;
@@ -24,7 +24,6 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
       setAyahs(data);
       setLoading(false);
     });
-    // Scroll handling is now managed by the parent container in Layout.tsx
   }, [surah.number]);
 
   const toggleSection = (ayahNum: number, section: 'tafsir' | 'lesson') => {
@@ -61,13 +60,12 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
     };
     audio.onerror = () => {
       setPlayingAyahNumber(null);
-      alert("Failed to play audio. Check your connection.");
     };
   };
 
   return (
-    <div className="min-h-full bg-white flex flex-col animate-in slide-in-from-right duration-400">
-      {/* Sticky Header - Offset to align with Layout header */}
+    <div className="bg-white animate-in slide-in-from-right duration-400">
+      {/* Sticky Header */}
       <div className="sticky top-0 bg-white/95 backdrop-blur-sm p-4 z-40 flex items-center gap-4 shadow-sm shadow-black/[0.02] border-b border-black/[0.02]">
         <button onClick={onBack} className="p-3 bg-white rounded-[10px] shadow-sm border border-black/[0.03] hover:scale-110 active:scale-95 transition-all">
           <ICONS.Back />
@@ -100,7 +98,7 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
       </div>
 
       {/* Ayah List */}
-      <div className="flex-1 p-6 space-y-10">
+      <div className="p-6 space-y-10">
         {loading ? (
           <div className="py-24 flex flex-col items-center gap-4">
              <div className="w-8 h-8 border-3 border-black border-t-transparent rounded-full animate-spin"></div>
@@ -143,7 +141,7 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
                     </p>
                   </div>
                   
-                  {/* Actions (Tafsir & Lesson) */}
+                  {/* Actions */}
                   <div className="grid grid-cols-2 gap-3">
                     <button 
                       onClick={() => toggleSection(ayah.number, 'tafsir')}
@@ -160,7 +158,7 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
                     </button>
                   </div>
 
-                  {/* Expanded Content View */}
+                  {/* Expanded Content */}
                   {expandedSection[ayah.number] && (
                     <div className="bg-white rounded-[10px] border border-black/[0.05] p-6 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
                       <div className="space-y-4">
@@ -175,16 +173,6 @@ const SurahDetail: React.FC<SurahDetailProps> = ({ surah, onBack }) => {
                             : (tab === 'bn' ? ayah.lesson_bn : ayah.lesson_en)
                           }
                         </p>
-                        <div className="pt-3 border-t border-black/[0.02] flex justify-between items-center">
-                           <p className="text-[9px] italic opacity-40">
-                             {tab === 'bn' ? 'সূত্র: সহজ কুরআন ও তাফসীর' : 'Source: Quran.com & Ibn Kathir'}
-                           </p>
-                           {expandedSection[ayah.number] === 'tafsir' && (
-                             <span className="text-[8px] font-bold uppercase tracking-widest opacity-30">
-                               {tab === 'bn' ? 'ইবনে কাসীর' : 'Ibn Kathir'}
-                             </span>
-                           )}
-                        </div>
                       </div>
                     </div>
                   )}
