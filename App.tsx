@@ -6,6 +6,7 @@ import PrayerTimes from './views/PrayerTimes.tsx';
 import DuaView from './views/Dua.tsx';
 import Quran from './views/Quran.tsx';
 import SurahDetail from './views/SurahDetail.tsx';
+import Privacy from './views/Privacy.tsx';
 import { View, Surah, PrayerTimings } from './types.ts';
 import { notificationService } from './services/notificationService.ts';
 import { fetchPrayerTimings } from './services/prayerService.ts';
@@ -24,55 +25,10 @@ const SplashScreen: React.FC = () => (
   </div>
 );
 
-const NotificationPrompt: React.FC<{ onComplete: (enabled: boolean) => void }> = ({ onComplete }) => {
-  const handleEnable = async () => {
-    const granted = await notificationService.requestPermission();
-    if (granted) {
-      localStorage.setItem('qalb_notifs', 'true');
-      notificationService.playBell();
-      localStorage.setItem('qalb_notif_prompted', 'true');
-      onComplete(true);
-    } else {
-      localStorage.setItem('qalb_notif_prompted', 'true');
-      onComplete(false);
-    }
-  };
-
-  const handleLater = () => {
-    localStorage.setItem('qalb_notif_prompted', 'true');
-    onComplete(false);
-  };
-
-  return (
-    <div className="fixed inset-0 z-[10000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-sm rounded-[24px] p-8 shadow-2xl space-y-8">
-        <div className="flex flex-col items-center text-center space-y-4">
-          <div className="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center shadow-lg shadow-black/20">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-          </div>
-          <div className="space-y-1">
-            <h2 className="text-xl font-black uppercase tracking-tight">Prayer Alerts</h2>
-            <h3 className="text-sm font-bold opacity-40 uppercase tracking-widest">নামাজের সর্তকবার্তা</h3>
-          </div>
-          <p className="text-xs font-medium leading-relaxed text-black/60">
-            Get notified when prayer time starts.
-            <br/><span className="font-bold">নামাজ শুরু হলে সর্তকবার্তা পান।</span>
-          </p>
-        </div>
-        <div className="flex flex-col gap-3">
-          <button onClick={handleEnable} className="w-full bg-black text-white py-4 rounded-[12px] text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 transition-all">Enable / চালু করুন</button>
-          <button onClick={handleLater} className="w-full bg-black/5 text-black py-4 rounded-[12px] text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 transition-all">Later / পরে করব</button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('home');
   const [selectedSurah, setSelectedSurah] = useState<Surah | null>(null);
   const [isSplashVisible, setIsSplashVisible] = useState(true);
-  const [showNotifPrompt, setShowNotifPrompt] = useState(false);
   const [notifsEnabled, setNotifsEnabled] = useState(localStorage.getItem('qalb_notifs') === 'true');
   const [globalTimings, setGlobalTimings] = useState<PrayerTimings | null>(null);
 
@@ -93,9 +49,6 @@ const App: React.FC = () => {
 
     const splashTimer = setTimeout(() => {
       setIsSplashVisible(false);
-      if (!localStorage.getItem('qalb_notif_prompted')) {
-        setShowNotifPrompt(true);
-      }
     }, 2500);
 
     const handleVisibilityChange = () => {
@@ -134,23 +87,29 @@ const App: React.FC = () => {
 
   const renderView = () => {
     switch (currentView) {
-      case 'home': return <Home timingsFromParent={globalTimings} />;
+      case 'home': return <Home timingsFromParent={globalTimings} onNavigate={setCurrentView} />;
       case 'prayer': return <PrayerTimes timingsFromParent={globalTimings} />;
       case 'dua': return <DuaView />;
       case 'quran': return <Quran onSelectSurah={(s) => { setSelectedSurah(s); setCurrentView('surah-detail'); }} />;
-      case 'surah-detail': return selectedSurah ? <SurahDetail surah={selectedSurah} onBack={() => setCurrentView('quran')} /> : <Home timingsFromParent={globalTimings} />;
-      default: return <Home timingsFromParent={globalTimings} />;
+      case 'surah-detail': return selectedSurah ? <SurahDetail surah={selectedSurah} onBack={() => setCurrentView('quran')} /> : <Home timingsFromParent={globalTimings} onNavigate={setCurrentView} />;
+      case 'privacy': return <Privacy onBack={() => setCurrentView('home')} />;
+      default: return <Home timingsFromParent={globalTimings} onNavigate={setCurrentView} />;
     }
+  };
+
+  const getViewTitle = () => {
+    if (currentView === 'surah-detail') return selectedSurah?.englishName;
+    if (currentView === 'privacy') return 'Privacy Policy';
+    return currentView;
   };
 
   return (
     <>
       {isSplashVisible && <SplashScreen />}
-      {showNotifPrompt && <NotificationPrompt onComplete={(e) => { setShowNotifPrompt(false); setNotifsEnabled(e); }} />}
       <Layout 
         currentView={currentView} 
         onNavigate={setCurrentView}
-        title={currentView === 'surah-detail' ? selectedSurah?.englishName : currentView}
+        title={getViewTitle()}
         notifsEnabled={notifsEnabled}
         onToggleNotifs={handleToggleNotifs}
       >

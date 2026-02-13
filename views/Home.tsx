@@ -3,14 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { getNextPrayer } from '../services/prayerService.ts';
 import { fetchAyahDetail } from '../services/quranService.ts';
 import { cacheService } from '../services/cacheService.ts';
-import { PrayerTimings, Ayah } from '../types.ts';
+import { PrayerTimings, Ayah, View } from '../types.ts';
 import { DAILY_DUAS } from '../constants.tsx';
 
 interface HomeProps {
   timingsFromParent: PrayerTimings | null;
+  onNavigate: (view: View) => void;
 }
 
-const Home: React.FC<HomeProps> = ({ timingsFromParent }) => {
+const Home: React.FC<HomeProps> = ({ timingsFromParent, onNavigate }) => {
   const [nextPrayer, setNextPrayer] = useState<{ name: string; time: Date } | null>(null);
   const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<string>('00:00:00');
@@ -215,7 +216,12 @@ const Home: React.FC<HomeProps> = ({ timingsFromParent }) => {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">CREDIT: <span className="text-black">CODENEST25</span></p>
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">DEVELOPER: <span className="text-black">@SIAMAFRID</span></p>
         </div>
-        <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="text-[9px] font-black uppercase tracking-[0.2em] text-black/30 underline decoration-black/10 underline-offset-4">Privacy Policy</a>
+        <button 
+          onClick={() => onNavigate('privacy')}
+          className="text-[9px] font-black uppercase tracking-[0.2em] text-black/30 underline decoration-black/10 underline-offset-4 active:opacity-60"
+        >
+          Privacy Policy
+        </button>
       </footer>
     </div>
   );

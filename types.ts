@@ -53,7 +53,7 @@ export interface Dua {
   isRuqyah?: boolean;
 }
 
-export type View = 'home' | 'prayer' | 'dua' | 'quran' | 'surah-detail';
+export type View = 'home' | 'prayer' | 'dua' | 'quran' | 'surah-detail' | 'privacy';
 
 export interface NotificationSettings {
   enabled: boolean;
